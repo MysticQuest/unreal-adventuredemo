@@ -18,8 +18,6 @@ UGrabbable::UGrabbable()
 void UGrabbable::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 	
 }
 
@@ -29,6 +27,7 @@ void UGrabbable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	FRotator CameraRotation = GetComponentRotation();
+
 }
 
