@@ -30,43 +30,50 @@ void UGrabbable::TickComponent(
 	AlignGrabbed();
 }
 
-void UGrabbable::Grab()
-{
-	if (PhysicsHandle == nullptr) { return; }
-
-	if (CheckForGrabbable())
-	{
-		PhysicsHandle->GrabComponentAtLocationWithRotation
-		(
-			HitResult.GetComponent(),
-			NAME_None,
-			HitResult.ImpactPoint,
-			GetComponentRotation()
-		);
-
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("::: " + HitActor->GetActorNameOrLabel()));
-	}
-}
-
-bool UGrabbable::CheckForGrabbable()
+bool UGrabbable::CheckForGrabbable(FHitResult& OutHitResult) const
 {
 	FVector Start = GetComponentLocation();
 	FVector End = Start + GetForwardVector() * MaxGrabDistance;
 
 	FCollisionShape CollisionShape = FCollisionShape::MakeSphere(GrabRadius);
 	return GetWorld()->SweepSingleByChannel(
-		HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel2, CollisionShape);
+		OutHitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel2, CollisionShape);
+}
+
+void UGrabbable::Grab()
+{
+	if (PhysicsHandle == nullptr) { return; }
+
+	FHitResult HitResult;
+	if (CheckForGrabbable(HitResult))
+	{
+		UPrimitiveComponent* HitComponent = HitResult.GetComponent();
+		HitComponent->WakeAllRigidBodies();
+		PhysicsHandle->GrabComponentAtLocationWithRotation
+		(
+			HitComponent,
+			NAME_None,
+			HitResult.ImpactPoint,
+			GetComponentRotation()
+		);
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("::: " + HitActor->GetActorNameOrLabel()));
+	}
 }
 
 void UGrabbable::AlignGrabbed()
 {
 	if (PhysicsHandle == nullptr) { return; }
+	if (PhysicsHandle->GetGrabbedComponent() != nullptr) {
 
-	FVector TargetLocation = GetComponentLocation() + GetForwardVector() * GrabDistance;
-	PhysicsHandle->SetTargetLocationAndRotation(TargetLocation, GetComponentRotation());
+		FVector TargetLocation = GetComponentLocation() + GetForwardVector() * GrabDistance;
+		PhysicsHandle->SetTargetLocationAndRotation(
+			TargetLocation, GetComponentRotation()
+		);
+	}
 }
 
 void UGrabbable::Release()
 {
-
+	if (PhysicsHandle == nullptr) { return; }
+	if (PhysicsHandle->GetGrabbedComponent() != nullptr) { PhysicsHandle->ReleaseComponent(); }
 }
