@@ -48,6 +48,7 @@ void UGrabbable::Grab()
 	if (CheckForGrabbable(HitResult))
 	{
 		UPrimitiveComponent* HitComponent = HitResult.GetComponent();
+		HitResult.GetActor()->Tags.Add(GrabTag);
 		HitComponent->WakeAllRigidBodies();
 		PhysicsHandle->GrabComponentAtLocationWithRotation
 		(
@@ -56,7 +57,6 @@ void UGrabbable::Grab()
 			HitResult.ImpactPoint,
 			GetComponentRotation()
 		);
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("::: " + HitActor->GetActorNameOrLabel()));
 	}
 }
 
@@ -74,6 +74,10 @@ void UGrabbable::AlignGrabbed()
 
 void UGrabbable::Release()
 {
-	if (PhysicsHandle == nullptr) { return; }
-	if (PhysicsHandle->GetGrabbedComponent() != nullptr) { PhysicsHandle->ReleaseComponent(); }
+	if (PhysicsHandle && PhysicsHandle->GetGrabbedComponent())
+	{
+		AActor* GrabbedActor = PhysicsHandle->GetGrabbedComponent()->GetOwner();
+		GrabbedActor->Tags.Remove(GrabTag);
+		PhysicsHandle->ReleaseComponent(); 
+	}
 }

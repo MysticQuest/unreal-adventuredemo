@@ -41,3 +41,7 @@ void UMovable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	}
 }
 
+void UMovable::SetShouldMove(bool _ShouldMove)
+{
+	ShouldMove = _ShouldMove;
+}

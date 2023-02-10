@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void Grab();
 
+	UPROPERTY(EditAnywhere)
+		FName GrabTag = "Grabbed";
+
 private: 
 	UPROPERTY(EditAnywhere)
 		float MaxGrabDistance = 130;
