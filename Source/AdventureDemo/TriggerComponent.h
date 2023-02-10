@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
 #include "Movable.h"
+#include "MasterGameInstance.h"
 #include "TriggerComponent.generated.h"
 
 /**
@@ -28,8 +29,6 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	UPROPERTY(EditAnywhere)
-		FName TriggerTag = "JoinSkeleton";
 
 	UPROPERTY(EditAnywhere)
 		AActor* TriggerTarget;
@@ -39,4 +38,5 @@ private:
 	AActor* GetOverlappingActor() const;
 	AActor* OverlappingActor;
 	UMovable* Movable;
+	UMasterGameInstance* MasterGameInstance;
 };

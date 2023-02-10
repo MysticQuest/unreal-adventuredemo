@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "MasterGameInstance.h"
 #include "Grabbable.generated.h"
 
 
@@ -31,9 +32,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void Grab();
 
-	UPROPERTY(EditAnywhere)
-		FName GrabTag = "Grabbed";
-
 private: 
 	UPROPERTY(EditAnywhere)
 		float MaxGrabDistance = 130;
@@ -47,4 +45,5 @@ private:
 	bool CheckForGrabbable(FHitResult& OutHitResult) const;
 	void AlignGrabbed();
 	UPhysicsHandleComponent* PhysicsHandle;
+	UMasterGameInstance* MasterGameInstance;
 };

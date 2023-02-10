@@ -2,6 +2,7 @@
 
 
 #include "TriggerComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 UTriggerComponent::UTriggerComponent()
 {
@@ -16,6 +17,7 @@ void UTriggerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	MasterGameInstance = Cast<UMasterGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	Movable = TriggerTarget->FindComponentByClass<UMovable>();
 }
 
@@ -51,7 +53,7 @@ AActor* UTriggerComponent::GetOverlappingActor() const
 
 		for (AActor* Actor : Actors)
 		{
-			if (Actor->ActorHasTag(TriggerTag) && !Actor->ActorHasTag("Grabbed"))
+			if (MasterGameInstance && Actor->ActorHasTag(MasterGameInstance->SkeletonSkullTag) && !Actor->ActorHasTag(MasterGameInstance->GrabbedTag))
 			{ 
 				return Actor;
 			}

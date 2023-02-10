@@ -2,6 +2,7 @@
 
 
 #include "Grabbable.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UGrabbable::UGrabbable()
@@ -17,6 +18,7 @@ void UGrabbable::BeginPlay()
 {
 	Super::BeginPlay();
 
+	MasterGameInstance = Cast<UMasterGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
 }
 
@@ -48,7 +50,7 @@ void UGrabbable::Grab()
 	if (CheckForGrabbable(HitResult))
 	{
 		UPrimitiveComponent* HitComponent = HitResult.GetComponent();
-		HitResult.GetActor()->Tags.Add(GrabTag);
+		HitResult.GetActor()->Tags.Add(MasterGameInstance->GrabbedTag);
 		HitComponent->WakeAllRigidBodies();
 		PhysicsHandle->GrabComponentAtLocationWithRotation
 		(
@@ -77,7 +79,7 @@ void UGrabbable::Release()
 	if (PhysicsHandle && PhysicsHandle->GetGrabbedComponent())
 	{
 		AActor* GrabbedActor = PhysicsHandle->GetGrabbedComponent()->GetOwner();
-		GrabbedActor->Tags.Remove(GrabTag);
+		GrabbedActor->Tags.Remove(MasterGameInstance->GrabbedTag);
 		PhysicsHandle->ReleaseComponent(); 
 	}
 }
