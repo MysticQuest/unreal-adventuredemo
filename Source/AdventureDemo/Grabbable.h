@@ -27,22 +27,30 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	UFUNCTION(BlueprintCallable)
-	void Release();
+		void Release();
 
 	UFUNCTION(BlueprintCallable)
 		void Grab();
 
+	UFUNCTION(BlueprintCallable)
+		bool CheckForGrabbable(FHitResult& OutHitResult) const;
+
+	UFUNCTION(BlueprintCallable)
+		bool IsGrabbing();
+
 private: 
 	UPROPERTY(EditAnywhere)
-		float MaxGrabDistance = 130;
+		float MaxGrabDistance = 165;
 
 	UPROPERTY(EditAnywhere)
-		float GrabRadius = 70;
+		float GrabCapsuleRadius = 4;
+
+	UPROPERTY(EditAnywhere)
+		float GrabCapsuleHalfHeight = 1;
 
 	UPROPERTY(EditAnywhere)
 		float GrabDistance = 100;
 
-	bool CheckForGrabbable(FHitResult& OutHitResult) const;
 	void AlignGrabbed();
 	UPhysicsHandleComponent* PhysicsHandle;
 	UMasterGameInstance* MasterGameInstance;

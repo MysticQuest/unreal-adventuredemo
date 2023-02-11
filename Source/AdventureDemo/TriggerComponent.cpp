@@ -40,6 +40,7 @@ void UTriggerComponent::OverlapTrigger()
 			Component->SetSimulatePhysics(false);
 		}
 		OverlappingActor->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		Cast<UStaticMeshComponent>(OverlappingActor->GetComponentByClass(UStaticMeshComponent::StaticClass()))->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
 		Movable->SetShouldMove(true);
 	}
 	else { Movable->SetShouldMove(false); };

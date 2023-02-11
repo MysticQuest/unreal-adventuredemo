@@ -19,6 +19,10 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
+		FName InteractableTag = "Interactable";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
+		FName GrabbableTag = "Grabbable";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
 		FName GrabbedTag = "Grabbed";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
 		FName SkeletonSkullTag = "JoinSkeleton";

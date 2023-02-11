@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Grabbable.h"
+#include "Blueprint/UserWidget.h"
 #include "AdventureDemoCharacter.generated.h"
 
 class UInputComponent;
@@ -64,6 +66,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	bool GetHasRifle();
 
+	UFUNCTION(BlueprintCallable, Category = Widget)
+	void WidgetManager();
+
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -77,11 +82,22 @@ protected:
 	// End of APawn interface
 
 public:
+	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+		TSubclassOf<UUserWidget> DotWidgetClass;
 
+private: 
+
+	UGrabbable* Grabbable;
+	void OnGrabPressed();
+
+	UUserWidget* DotWidget;
+	UWidgetAnimation* FadeAnimation;
 };
 

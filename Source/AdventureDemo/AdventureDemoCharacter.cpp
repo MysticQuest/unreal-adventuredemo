@@ -3,6 +3,8 @@
 #include "AdventureDemoCharacter.h"
 #include "AdventureDemoProjectile.h"
 #include "Animation/AnimInstance.h"
+#include "Blueprint/UserWidget.h"
+#include "UMG/Public/Animation/WidgetAnimation.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
@@ -34,7 +36,6 @@ AAdventureDemoCharacter::AAdventureDemoCharacter()
 	Mesh1P->CastShadow = false;
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
-
 }
 
 void AAdventureDemoCharacter::BeginPlay()
@@ -51,6 +52,9 @@ void AAdventureDemoCharacter::BeginPlay()
 		}
 	}
 
+	Grabbable = Cast<UGrabbable>(GetComponentByClass(UGrabbable::StaticClass()));
+	DotWidget = CreateWidget<UUserWidget>(GetWorld(), DotWidgetClass);
+	DotWidget->AddToViewport();
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -69,7 +73,29 @@ void AAdventureDemoCharacter::SetupPlayerInputComponent(class UInputComponent* P
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAdventureDemoCharacter::Look);
+
+		InputComponent->BindAction("Grab", EInputEvent::IE_Pressed, this, &AAdventureDemoCharacter::OnGrabPressed);
 	}
+}
+
+void AAdventureDemoCharacter::OnGrabPressed()
+{
+	if (!Grabbable->IsGrabbing()) 
+	{ 
+		Grabbable->Grab(); 
+	}
+	else { Grabbable->Release(); }
+}
+
+void AAdventureDemoCharacter::WidgetManager()
+{
+	if (!Grabbable || !DotWidget) { return; }
+	FHitResult HitResult;
+	if (Grabbable->CheckForGrabbable(HitResult) && !Grabbable->IsGrabbing())
+	{
+		DotWidget->SetColorAndOpacity(FLinearColor(1,1,1,.5f));
+	}
+	else { DotWidget->SetColorAndOpacity(FLinearColor(1, 1, 1, 0)); }
 }
 
 

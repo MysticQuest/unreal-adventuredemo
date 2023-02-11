@@ -37,7 +37,7 @@ bool UGrabbable::CheckForGrabbable(FHitResult& OutHitResult) const
 	FVector Start = GetComponentLocation();
 	FVector End = Start + GetForwardVector() * MaxGrabDistance;
 
-	FCollisionShape CollisionShape = FCollisionShape::MakeSphere(GrabRadius);
+	FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(GrabCapsuleRadius, GrabCapsuleHalfHeight);
 	return GetWorld()->SweepSingleByChannel(
 		OutHitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel2, CollisionShape);
 }
@@ -50,23 +50,40 @@ void UGrabbable::Grab()
 	if (CheckForGrabbable(HitResult))
 	{
 		UPrimitiveComponent* HitComponent = HitResult.GetComponent();
-		HitResult.GetActor()->Tags.Add(MasterGameInstance->GrabbedTag);
 		HitComponent->WakeAllRigidBodies();
-		PhysicsHandle->GrabComponentAtLocationWithRotation
-		(
-			HitComponent,
-			NAME_None,
-			HitResult.ImpactPoint,
-			GetComponentRotation()
-		);
+
+		if (HitResult.GetActor()->Tags.Contains(MasterGameInstance->GrabbableTag)) 
+		{
+			HitResult.GetActor()->Tags.Add(MasterGameInstance->GrabbedTag);
+			PhysicsHandle->GrabComponentAtLocationWithRotation
+			(
+				HitComponent,
+				NAME_None,
+				HitResult.ImpactPoint,
+				GetComponentRotation()
+			);
+		}
+		else if (HitResult.GetActor()->Tags.Contains(MasterGameInstance->InteractableTag))
+		{
+			FVector CurrentLocation = HitResult.GetActor()->GetActorLocation();
+			FVector TargetLocation = CurrentLocation + FVector(0.f, -7.f, 0.f);
+			HitResult.GetActor()->SetActorLocation(TargetLocation, false, nullptr, ETeleportType::TeleportPhysics);
+			Cast<UStaticMeshComponent>(HitResult.GetActor()->GetComponentByClass(UStaticMeshComponent::StaticClass()))->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
+		}
 	}
+}
+
+bool UGrabbable::IsGrabbing()
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("Bool: %s"), PhysicsHandle && PhysicsHandle->GetGrabbedComponent() ? TEXT("true") : TEXT("false")));
+	if (PhysicsHandle && PhysicsHandle->GetGrabbedComponent()) { return true; }
+	else { return false; }
 }
 
 void UGrabbable::AlignGrabbed()
 {
-	if (PhysicsHandle == nullptr) { return; }
-	if (PhysicsHandle->GetGrabbedComponent() != nullptr) {
-
+	if (IsGrabbing())
+	{
 		FVector TargetLocation = GetComponentLocation() + GetForwardVector() * GrabDistance;
 		PhysicsHandle->SetTargetLocationAndRotation(
 			TargetLocation, GetComponentRotation()
@@ -76,7 +93,7 @@ void UGrabbable::AlignGrabbed()
 
 void UGrabbable::Release()
 {
-	if (PhysicsHandle && PhysicsHandle->GetGrabbedComponent())
+	if (IsGrabbing())
 	{
 		AActor* GrabbedActor = PhysicsHandle->GetGrabbedComponent()->GetOwner();
 		GrabbedActor->Tags.Remove(MasterGameInstance->GrabbedTag);
