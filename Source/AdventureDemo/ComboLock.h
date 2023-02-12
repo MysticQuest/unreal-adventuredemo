@@ -34,7 +34,7 @@ private:
 
 	static int Combo;
 	static int Pressed;
-	static TArray<UMovable*> AllMovables;
+	static TArray<UMovable*> ActivatedMovables;
 	static TArray<UStaticMeshComponent*> AllMeshes;
 
 	UMovable* MyMovable;
@@ -45,8 +45,17 @@ private:
 
 	static AActor* SharedActor;
 
+	UWorld* World;
+
 	void IncrementCombo();
 	void IncrementPressed();
 	void Unlock();
-	static void StaticReset();
+
+	UFUNCTION()
+	void StaticReset(UWorld* zeWorld);
+
+	void DeactivateTriggers();
+	void ReactivateTriggers();
+
+	FTimerHandle ResetTimerHandle;
 };

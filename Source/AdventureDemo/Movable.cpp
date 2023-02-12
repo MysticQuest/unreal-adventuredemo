@@ -36,14 +36,12 @@ void UMovable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	if (ShouldMove)
 	{
-		SetShouldMoveBack(false);
 		FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, Speed);
 		GetOwner()->SetActorLocation(NewLocation);
 	}
 
 	if (ShouldMoveBack)
 	{
-		SetShouldMove(false);
 		FVector StartingLocation = FMath::VInterpConstantTo(CurrentLocation, InitialLocation, DeltaTime, Speed);
 		GetOwner()->SetActorLocation(StartingLocation);
 	}
@@ -52,9 +50,11 @@ void UMovable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 void UMovable::SetShouldMove(bool _ShouldMove)
 {
 	ShouldMove = _ShouldMove;
+	ShouldMoveBack = false;
 }
 
 void UMovable::SetShouldMoveBack(bool _ShouldMoveBack)
 {
 	ShouldMoveBack = _ShouldMoveBack;
+	ShouldMove = false;
 }
