@@ -30,6 +30,9 @@ public:
 
 	void ActivateButton();
 
+	// Called by game instance
+	void static ResetStatics();
+
 private:
 
 	static int Combo;
@@ -52,7 +55,7 @@ private:
 	void Unlock();
 
 	UFUNCTION()
-	void StaticReset(UWorld* zeWorld);
+	void Reset(UWorld* zeWorld);
 
 	void DeactivateTriggers();
 	void ReactivateTriggers();

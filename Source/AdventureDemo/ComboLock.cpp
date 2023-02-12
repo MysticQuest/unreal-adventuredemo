@@ -28,9 +28,6 @@ void UComboLock::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UComboLock::Combo = 0;
-	UComboLock::Pressed = 0;
-
 	if (TriggerTarget) { SharedActor = TriggerTarget; }
 	else { if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("TriggerTarget for ComboLock has not been set!"))); } }
 
@@ -45,6 +42,8 @@ void UComboLock::BeginPlay()
 void UComboLock::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("Meshes: %d"), AllMeshes.Num()));
 }
 
 void UComboLock::ActivateButton()
@@ -57,7 +56,7 @@ void UComboLock::ActivateButton()
 	IncrementPressed();
 	if (IsCorrect) { IncrementCombo(); }
 
-	if (UComboLock::Pressed > 7 && UComboLock::Combo < 8) { StaticReset(GetOwner()->GetWorld()); }
+	if (UComboLock::Pressed > 7 && UComboLock::Combo < 8) { Reset(GetOwner()->GetWorld()); }
 	else if ( UComboLock::Combo > 7 ) { Unlock(); }
 }
 
@@ -71,7 +70,7 @@ void UComboLock::IncrementCombo()
 	UComboLock::Combo++;
 }
 
-void UComboLock::StaticReset(UWorld* zeWorld)
+void UComboLock::Reset(UWorld* zeWorld)
 {
 	if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("Wrong combination..."))); }
 
@@ -80,41 +79,12 @@ void UComboLock::StaticReset(UWorld* zeWorld)
 
 	DeactivateTriggers();
 	GetWorld()->GetTimerManager().SetTimer(ResetTimerHandle, this, &UComboLock::ReactivateTriggers, 2, false, 2);
-
-	//World = GEngine->GameViewport->GetWorld();
-	//if (World == nullptr) 
-	//{ 
-	//	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("world is ptrnull")));
-	//	return;
-	//}
-	//World->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateLambda([&]()
-	//	{
-	//		FTimerHandle TimerHandle = FTimerHandle();
-	//		/*World->GetTimerManager().ClearTimer(TimerHandle);*/
-	//		//TimerHandle.Invalidate();
-	//		if (!TimerHandle.IsValid())
-	//		{
-	//			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("TimerHandle is invalid")));
-	//			return;
-	//		}
-
-	//		World->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]()
-	//			{
-	//				for (UStaticMeshComponent* Mesh : AllMeshes)
-	//				{
-	//					Mesh->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
-	//				}
-	//				for (UMovable* Movable : AllMovables)
-	//				{
-	//					Movable->SetShouldMoveBack(true);
-	//				}
-	//			}), 1.0f, false);
-	//	}));
 }
 
 void UComboLock::DeactivateTriggers()
 {
 	if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("DEactivating..."))); }
+
 	for (UStaticMeshComponent* Mesh : AllMeshes)
 	{
 		Mesh->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
@@ -132,7 +102,6 @@ void UComboLock::ReactivateTriggers()
 	{
 		Movable->SetShouldMoveBack(true);
 	}
-	//World->GetTimerManager().ClearTimer(ResetTimerHandle);
 }
 
 void UComboLock::Unlock() 
@@ -141,4 +110,12 @@ void UComboLock::Unlock()
 	SharedActor->FindComponentByClass<UMovable>()->SetShouldMove(true);
 
 	DeactivateTriggers();
+}
+
+void UComboLock::ResetStatics()
+{
+	UComboLock::Pressed = 0;
+	UComboLock::Combo = 0;
+	ActivatedMovables.Empty();
+	AllMeshes.Empty();
 }
