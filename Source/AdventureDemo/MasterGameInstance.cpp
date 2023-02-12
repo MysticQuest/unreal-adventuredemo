@@ -9,5 +9,5 @@ UMasterGameInstance::UMasterGameInstance() {}
 void UMasterGameInstance::OnStart()
 {
     Super::OnStart();
-    UComboLock::Pressed = 0;
+    //UComboLock::Pressed = 0;
 }

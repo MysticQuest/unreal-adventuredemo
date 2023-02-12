@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Movable.h"
 #include "ComboLock.generated.h"
 
 
@@ -20,20 +21,32 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	UPROPERTY(EditAnywhere)
 		bool IsCorrect = false;
 
-	void IncrementCombo();
-	void IncrementPressed();
+	void ActivateButton();
 
-	void Reset();
-	void Unlock();
-	void Activate();
+private:
 
 	static int Combo;
 	static int Pressed;
+	static TArray<UMovable*> AllMovables;
+	static TArray<UStaticMeshComponent*> AllMeshes;
+
+	UMovable* MyMovable;
+	UStaticMeshComponent* MyMesh;
+
+	UPROPERTY(EditAnywhere)
+		AActor* TriggerTarget;
+
+	static AActor* SharedActor;
+
+	void IncrementCombo();
+	void IncrementPressed();
+	void Unlock();
+	static void StaticReset();
 };

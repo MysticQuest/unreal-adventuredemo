@@ -68,14 +68,7 @@ void UGrabbable::Grab()
 		else if (OverlappingActor->Tags.Contains(MasterGameInstance->InteractableTag))
 		{
 			UComboLock* ComboComp = OverlappingActor->FindComponentByClass<UComboLock>();
-			ComboComp->IncrementPressed();
-			if (ComboComp->IsCorrect) { ComboComp->IncrementCombo(); }
-
-			if (ComboComp->Pressed > 7 && ComboComp->Combo < 8) {}
-			else {}
-
-			OverlappingActor->FindComponentByClass<UMovable>()->SetShouldMove(true);
-			Cast<UStaticMeshComponent>(HitResult.GetActor()->GetComponentByClass(UStaticMeshComponent::StaticClass()))->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
+			ComboComp->ActivateButton();
 		}
 	}
 }

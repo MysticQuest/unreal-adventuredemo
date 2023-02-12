@@ -3,9 +3,14 @@
 
 #include "ComboLock.h"
 #include "Movable.h"
+#include "Engine/Engine.h"
+#include "Engine/World.h"
 
 int UComboLock::Combo = 0;
 int UComboLock::Pressed = 0;
+AActor* UComboLock::SharedActor = nullptr;
+TArray<UMovable*> UComboLock::AllMovables;
+TArray<UStaticMeshComponent*> UComboLock::AllMeshes;
 
 // Sets default values for this component's properties
 UComboLock::UComboLock()
@@ -22,6 +27,15 @@ UComboLock::UComboLock()
 void UComboLock::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UComboLock::Combo = 0;
+	UComboLock::Pressed = 0;
+
+	if (TriggerTarget) { SharedActor = TriggerTarget; }
+	else { if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("TriggerTarget for ComboLock has not been set!"))); } }
+
+	MyMovable = GetOwner()->FindComponentByClass<UMovable>();
+	MyMesh = Cast<UStaticMeshComponent>(GetOwner()->GetComponentByClass(UStaticMeshComponent::StaticClass()));
 }
 
 
@@ -29,16 +43,21 @@ void UComboLock::BeginPlay()
 void UComboLock::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("how many buttons were pressed: %d"), UComboLock::Pressed));
-	}
 }
 
-void UComboLock::Activate()
+void UComboLock::ActivateButton()
 {
+	AllMovables.Add(MyMovable);
+	AllMeshes.Add(MyMesh);
 
+	GetOwner()->FindComponentByClass<UMovable>()->SetShouldMove(true);
+	Cast<UStaticMeshComponent>(GetOwner()->GetComponentByClass(UStaticMeshComponent::StaticClass()))->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
+
+	IncrementPressed();
+	if (IsCorrect) { IncrementCombo(); }
+
+	if (UComboLock::Pressed > 7 && UComboLock::Combo < 8) { StaticReset(); }
+	else if ( UComboLock::Combo > 7 ) { Unlock(); }
 }
 
 void UComboLock::IncrementPressed()
@@ -51,13 +70,43 @@ void UComboLock::IncrementCombo()
 	UComboLock::Combo++;
 }
 
-void UComboLock::Reset() 
+void UComboLock::StaticReset()
 {
+	if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("Wrong combination..."))); }
+
 	UComboLock::Pressed = 0;
 	UComboLock::Combo = 0;
+
+	for (UStaticMeshComponent* Mesh : AllMeshes)
+	{
+		Mesh->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
+	}
+
+	UWorld* World = GEngine->GetWorld(); //world is probs 0
+	if (World == nullptr) 
+	{ 
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("world is ptrnull")));
+		return;
+	}
+	World->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateLambda([&]()
+		{
+			FTimerHandle TimerHandle;
+			World->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]()
+				{
+					for (UStaticMeshComponent* Mesh : AllMeshes)
+					{
+						Mesh->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
+					}
+					for (UMovable* Movable : AllMovables)
+					{
+						Movable->SetShouldMoveBack(true);
+					}
+				}), 1.0f, false);
+		}));
 }
 
 void UComboLock::Unlock() 
 {
-
+	if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("The door has been unlocked..."))); }
+	SharedActor->FindComponentByClass<UMovable>()->SetShouldMove(true);
 }

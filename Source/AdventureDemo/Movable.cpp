@@ -30,21 +30,22 @@ void UMovable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	FVector TargetLocation = InitialLocation + MoveOffset;
+	float Speed = FVector::Distance(InitialLocation, TargetLocation) / MoveDuration;
+	FVector CurrentLocation = GetOwner()->GetActorLocation();
+
 	if (ShouldMove)
 	{
-		FVector TargetLocation = InitialLocation + MoveOffset;
-		float Speed = FVector::Distance(InitialLocation, TargetLocation) / MoveDuration;
-
-		FVector CurrentLocation = GetOwner()->GetActorLocation();
+		SetShouldMoveBack(false);
 		FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, Speed);
 		GetOwner()->SetActorLocation(NewLocation);
+	}
 
-		if (ShouldMoveBack)
-		{
-			ShouldMove = false;
-			FVector StartingLocation = FMath::VInterpConstantTo(CurrentLocation, InitialLocation, DeltaTime, Speed);
-			GetOwner()->SetActorLocation(StartingLocation);
-		}
+	if (ShouldMoveBack)
+	{
+		SetShouldMove(false);
+		FVector StartingLocation = FMath::VInterpConstantTo(CurrentLocation, InitialLocation, DeltaTime, Speed);
+		GetOwner()->SetActorLocation(StartingLocation);
 	}
 }
 
