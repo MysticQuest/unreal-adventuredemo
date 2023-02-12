@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Movable.generated.h"
+#include "ComboLock.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class ADVENTUREDEMO_API UMovable : public UActorComponent
+class ADVENTUREDEMO_API UComboLock : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UMovable();
+	UComboLock();
 
 protected:
 	// Called when the game starts
@@ -23,20 +23,17 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	void SetShouldMove(bool ShouldMove);
-	void SetShouldMoveBack(bool ShouldMoveBack);
-
-private:
+	
 	UPROPERTY(EditAnywhere)
-		FVector MoveOffset = FVector(0, 0, 400);
+		bool IsCorrect = false;
 
-	UPROPERTY(EditAnywhere)
-		float MoveDuration = 4;
+	void IncrementCombo();
+	void IncrementPressed();
 
-	bool ShouldMove = false;
-	bool ShouldMoveBack = false;
+	void Reset();
+	void Unlock();
+	void Activate();
 
-	FVector InitialLocation;
-		
+	static int Combo;
+	static int Pressed;
 };

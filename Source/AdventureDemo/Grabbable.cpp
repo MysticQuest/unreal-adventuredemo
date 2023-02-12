@@ -51,10 +51,11 @@ void UGrabbable::Grab()
 	{
 		UPrimitiveComponent* HitComponent = HitResult.GetComponent();
 		HitComponent->WakeAllRigidBodies();
+		OverlappingActor = HitResult.GetActor();
 
-		if (HitResult.GetActor()->Tags.Contains(MasterGameInstance->GrabbableTag)) 
+		if (OverlappingActor->Tags.Contains(MasterGameInstance->GrabbableTag))
 		{
-			HitResult.GetActor()->Tags.Add(MasterGameInstance->GrabbedTag);
+			OverlappingActor->Tags.Add(MasterGameInstance->GrabbedTag);
 			PhysicsHandle->GrabComponentAtLocationWithRotation
 			(
 				HitComponent,
@@ -63,11 +64,17 @@ void UGrabbable::Grab()
 				GetComponentRotation()
 			);
 		}
-		else if (HitResult.GetActor()->Tags.Contains(MasterGameInstance->InteractableTag))
+		// Class should be called interactable for better categorization between use/grab
+		else if (OverlappingActor->Tags.Contains(MasterGameInstance->InteractableTag))
 		{
-			FVector CurrentLocation = HitResult.GetActor()->GetActorLocation();
-			FVector TargetLocation = CurrentLocation + FVector(0.f, -7.f, 0.f);
-			HitResult.GetActor()->SetActorLocation(TargetLocation, false, nullptr, ETeleportType::TeleportPhysics);
+			UComboLock* ComboComp = OverlappingActor->FindComponentByClass<UComboLock>();
+			ComboComp->IncrementPressed();
+			if (ComboComp->IsCorrect) { ComboComp->IncrementCombo(); }
+
+			if (ComboComp->Pressed > 7 && ComboComp->Combo < 8) {}
+			else {}
+
+			OverlappingActor->FindComponentByClass<UMovable>()->SetShouldMove(true);
 			Cast<UStaticMeshComponent>(HitResult.GetActor()->GetComponentByClass(UStaticMeshComponent::StaticClass()))->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
 		}
 	}

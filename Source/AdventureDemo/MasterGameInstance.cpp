@@ -2,5 +2,12 @@
 
 
 #include "MasterGameInstance.h"
+#include "ComboLock.h"
 
 UMasterGameInstance::UMasterGameInstance() {}
+
+void UMasterGameInstance::OnStart()
+{
+    Super::OnStart();
+    UComboLock::Pressed = 0;
+}

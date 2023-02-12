@@ -6,6 +6,8 @@
 #include "Components/SceneComponent.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "MasterGameInstance.h"
+#include "Movable.h"
+#include "ComboLock.h"
 #include "Grabbable.generated.h"
 
 
@@ -54,4 +56,5 @@ private:
 	void AlignGrabbed();
 	UPhysicsHandleComponent* PhysicsHandle;
 	UMasterGameInstance* MasterGameInstance;
+	AActor* OverlappingActor;
 };

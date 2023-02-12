@@ -16,6 +16,7 @@ class ADVENTUREDEMO_API UMasterGameInstance : public UGameInstance
 	
 public:
 	UMasterGameInstance();
+	virtual void OnStart() override;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
