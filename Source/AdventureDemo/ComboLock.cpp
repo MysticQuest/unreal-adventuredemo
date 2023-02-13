@@ -42,8 +42,6 @@ void UComboLock::BeginPlay()
 void UComboLock::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("Meshes: %d"), AllMeshes.Num()));
 }
 
 void UComboLock::ActivateButton()

@@ -34,7 +34,10 @@ private:
 	UPROPERTY(EditAnywhere)
 		float MoveDuration = 4;
 
+	UPROPERTY(EditAnywhere)
 	bool ShouldMove = false;
+
+	UPROPERTY(EditAnywhere)
 	bool ShouldMoveBack = false;
 
 	FVector InitialLocation;
