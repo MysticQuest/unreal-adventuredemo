@@ -56,13 +56,15 @@ void AAdventureDemoCharacter::BeginPlay()
 	DotWidget = CreateWidget<UUserWidget>(GetWorld(), DotWidgetClass);
 	DotWidget->AddToViewport();
 
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAdventureDemoCharacter::DebugMe, 1, false, 3);
+	/*MyAudio = this->FindComponentByClass<UAudioSource>();*/
+
+	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("Calling timer...")));
+	//FTimerHandle TimerHandle;
+	//GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAdventureDemoCharacter::DebugMe, 1, false, 3);
 }
 
 void AAdventureDemoCharacter::DebugMe()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("test")));
 }
 
 //////////////////////////////////////////////////////////////////////////// Input

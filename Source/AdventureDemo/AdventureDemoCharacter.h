@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "Grabbable.h"
+//#include "AudioSource.h"
 #include "Blueprint/UserWidget.h"
 #include "AdventureDemoCharacter.generated.h"
 
@@ -100,6 +101,7 @@ private:
 	UUserWidget* DotWidget;
 	UWidgetAnimation* FadeAnimation;
 
+	/*UAudioSource* MyAudio;*/
 	void DebugMe();
 };
 
