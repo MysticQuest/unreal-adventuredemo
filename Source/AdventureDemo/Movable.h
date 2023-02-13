@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "AudioSource.h"
 #include "Movable.generated.h"
 
 
@@ -41,5 +42,8 @@ private:
 	bool ShouldMoveBack = false;
 
 	FVector InitialLocation;
-		
+	
+	UAudioSource* MyAudio;
+	void PlaySoundEffect(float duration);
+	//void PlaySoundEffect(float duration, int loops);
 };

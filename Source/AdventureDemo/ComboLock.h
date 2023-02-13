@@ -8,12 +8,13 @@
 #include "ComboLock.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ADVENTUREDEMO_API UComboLock : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UComboLock();
 
@@ -24,7 +25,7 @@ protected:
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+
 	UPROPERTY(EditAnywhere)
 		bool IsCorrect = false;
 
@@ -53,9 +54,10 @@ private:
 	void IncrementCombo();
 	void IncrementPressed();
 	void Unlock();
+	void OpenDoor();
 
 	UFUNCTION()
-	void Reset(UWorld* zeWorld);
+		void Reset(UWorld* zeWorld);
 
 	void DeactivateTriggers();
 	void ReactivateTriggers();

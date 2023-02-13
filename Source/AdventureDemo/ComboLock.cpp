@@ -48,8 +48,8 @@ void UComboLock::ActivateButton()
 {
 	ActivatedMovables.Add(MyMovable);
 
-	GetOwner()->FindComponentByClass<UMovable>()->SetShouldMove(true);
-	Cast<UStaticMeshComponent>(GetOwner()->GetComponentByClass(UStaticMeshComponent::StaticClass()))->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
+	MyMovable->SetShouldMove(true);
+	MyMesh->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
 
 	IncrementPressed();
 	if (IsCorrect) { IncrementCombo(); }
@@ -70,8 +70,6 @@ void UComboLock::IncrementCombo()
 
 void UComboLock::Reset(UWorld* zeWorld)
 {
-	if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("Wrong combination..."))); }
-
 	UComboLock::Pressed = 0;
 	UComboLock::Combo = 0;
 
@@ -81,8 +79,6 @@ void UComboLock::Reset(UWorld* zeWorld)
 
 void UComboLock::DeactivateTriggers()
 {
-	if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("DEactivating..."))); }
-
 	for (UStaticMeshComponent* Mesh : AllMeshes)
 	{
 		Mesh->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
@@ -91,7 +87,6 @@ void UComboLock::DeactivateTriggers()
 
 void UComboLock::ReactivateTriggers()
 {
-	if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("REactivating..."))); }
 	for (UStaticMeshComponent* Mesh : AllMeshes)
 	{
 		Mesh->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Block);
@@ -104,10 +99,15 @@ void UComboLock::ReactivateTriggers()
 
 void UComboLock::Unlock() 
 {
-	if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("The door has been unlocked..."))); }
-	SharedActor->FindComponentByClass<UMovable>()->SetShouldMove(true);
-
+	//if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("The door has been unlocked..."))); }
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UComboLock::OpenDoor, 1, false, 4);
 	DeactivateTriggers();
+}
+
+void UComboLock::OpenDoor()
+{
+	SharedActor->FindComponentByClass<UMovable>()->SetShouldMove(true);
 }
 
 void UComboLock::ResetStatics()

@@ -21,7 +21,7 @@ void UMovable::BeginPlay()
 	Super::BeginPlay();
 
 	InitialLocation = GetOwner()->GetActorLocation();
-	
+	MyAudio = GetOwner()->FindComponentByClass<UAudioSource>();
 }
 
 
@@ -41,7 +41,7 @@ void UMovable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	}
 
 	if (ShouldMoveBack)
-	{
+	{	
 		FVector StartingLocation = FMath::VInterpConstantTo(CurrentLocation, InitialLocation, DeltaTime, Speed);
 		GetOwner()->SetActorLocation(StartingLocation);
 	}
@@ -49,12 +49,18 @@ void UMovable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 void UMovable::SetShouldMove(bool _ShouldMove)
 {
+	if (_ShouldMove) { PlaySoundEffect(MoveDuration); }
 	ShouldMove = _ShouldMove;
 	ShouldMoveBack = false;
 }
 
 void UMovable::SetShouldMoveBack(bool _ShouldMoveBack)
 {
+	if (_ShouldMoveBack) { PlaySoundEffect(MoveDuration); }
 	ShouldMoveBack = _ShouldMoveBack;
 	ShouldMove = false;
+}
+
+void UMovable::PlaySoundEffect(float duration) {
+	MyAudio->PlayForSeconds(duration);
 }

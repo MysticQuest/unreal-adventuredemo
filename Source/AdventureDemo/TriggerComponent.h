@@ -33,6 +33,7 @@ private:
 	UPROPERTY(EditAnywhere)
 		AActor* TriggerTarget;
 
+	bool IsAttached = false;
 	void OverlapTrigger();
 
 	AActor* GetOverlappingActor() const;

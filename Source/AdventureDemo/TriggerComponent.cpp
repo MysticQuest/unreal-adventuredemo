@@ -32,7 +32,7 @@ void UTriggerComponent::TickComponent(
 void UTriggerComponent::OverlapTrigger()
 {
 	OverlappingActor = GetOverlappingActor();
-	if (Movable != nullptr && OverlappingActor != nullptr)
+	if (Movable != nullptr && OverlappingActor != nullptr && !IsAttached)
 	{
 		UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(OverlappingActor->GetRootComponent());
 		if (Component != nullptr)
@@ -42,8 +42,8 @@ void UTriggerComponent::OverlapTrigger()
 		OverlappingActor->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		Cast<UStaticMeshComponent>(OverlappingActor->GetComponentByClass(UStaticMeshComponent::StaticClass()))->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
 		Movable->SetShouldMove(true);
+		IsAttached = true;
 	}
-	else { Movable->SetShouldMove(false); };
 }
 
 AActor* UTriggerComponent::GetOverlappingActor() const
