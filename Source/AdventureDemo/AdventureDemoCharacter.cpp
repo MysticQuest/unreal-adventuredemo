@@ -55,6 +55,14 @@ void AAdventureDemoCharacter::BeginPlay()
 	Grabbable = Cast<UGrabbable>(GetComponentByClass(UGrabbable::StaticClass()));
 	DotWidget = CreateWidget<UUserWidget>(GetWorld(), DotWidgetClass);
 	DotWidget->AddToViewport();
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAdventureDemoCharacter::DebugMe, 1, false, 3);
+}
+
+void AAdventureDemoCharacter::DebugMe()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("test")));
 }
 
 //////////////////////////////////////////////////////////////////////////// Input

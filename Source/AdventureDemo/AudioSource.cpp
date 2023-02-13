@@ -10,7 +10,7 @@ UAudioSource::UAudioSource()
 
 void UAudioSource::PlaySound()
 {
-	UAudioComponent::Play();
+	Super::Play();
 }
 
 void UAudioSource::PlayForSeconds(float PlayTime)
@@ -27,5 +27,5 @@ void UAudioSource::LoopForTimes(int32 NumLoops)
 
 void UAudioSource::StopSound()
 {
-	UAudioComponent::Stop();
+	Super::Stop();
 }

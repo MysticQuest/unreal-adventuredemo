@@ -99,5 +99,7 @@ private:
 
 	UUserWidget* DotWidget;
 	UWidgetAnimation* FadeAnimation;
+
+	void DebugMe();
 };
 
