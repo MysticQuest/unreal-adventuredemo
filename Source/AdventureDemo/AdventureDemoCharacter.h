@@ -8,6 +8,7 @@
 #include "Grabbable.h"
 #include "AudioSource.h"
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetBlueprintGeneratedClass.h"
 #include "MasterGameInstance.h"
 #include "AdventureDemoCharacter.generated.h"
 
@@ -94,6 +95,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 		TSubclassOf<UUserWidget> DotWidgetClass;
 
+	//UPROPERTY(Transient, meta = (BindWidgetAnim))
+	//	UWidgetAnimation* FadeOut;
+
 private: 
 
 	UGrabbable* Grabbable;
@@ -105,11 +109,14 @@ private:
 	UAudioSource* MyAudio;
 	UMasterGameInstance* MasterGameInstance;
 	
+	//UUserWidget* LoadingWidget;
+
+	void ShowLoadingWidget();
+	void AnimateLoadingWidget();
+	void CleanLoadingWidget();
+
 	UUserWidget* LoadingWidget;
-
-	//void ShowLoadingWidget();
-	//void RemoveLoadingWidget();
-
-
+	TSubclassOf<UUserWidget> LoadingWidgetClass;
+	UWidgetBlueprintGeneratedClass* BPLoadingWidgetClass;
 };
 

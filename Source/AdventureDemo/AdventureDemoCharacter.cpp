@@ -4,6 +4,8 @@
 #include "AdventureDemoProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Widget.h"
+#include "Blueprint/WidgetBlueprintGeneratedClass.h"
 #include "UMG/Public/Animation/WidgetAnimation.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
@@ -37,23 +39,26 @@ AAdventureDemoCharacter::AAdventureDemoCharacter()
 	Mesh1P->CastShadow = false;
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
+	// Creates the widget reference instead of exposing it to the editor as was the case with the UI widget, for variety
+	LoadingWidgetClass = nullptr;
+	LoadingWidget = nullptr;
+
+	LoadingWidget = CreateDefaultSubobject<UUserWidget>("Widget");
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetObject(TEXT("/Game/Widgets/LoadingWidget"));
+	if (WidgetObject.Succeeded()) {
+		LoadingWidgetClass = WidgetObject.Class;
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "LoadingWidget not found!");
+		LoadingWidgetClass = nullptr;
+	}
 }
 
 void AAdventureDemoCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
-
-	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-	}
-
-	MasterGameInstance = Cast<UMasterGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
 	Grabbable = Cast<UGrabbable>(GetComponentByClass(UGrabbable::StaticClass()));
 	DotWidget = CreateWidget<UUserWidget>(GetWorld(), DotWidgetClass);
@@ -62,8 +67,9 @@ void AAdventureDemoCharacter::BeginPlay()
 	MyAudio = this->FindComponentByClass<UAudioSource>();
 	if (MyAudio) { MyAudio->Super::FadeIn(3, MyAudio->Super::GetSound()->GetVolumeMultiplier(), 0, EAudioFaderCurve::Linear); }
 
-	//FTimerHandle TimerHandle;
-	//GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAdventureDemoCharacter::RemoveLoadingWidget, 1, false, 1);
+	ShowLoadingWidget();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAdventureDemoCharacter::AnimateLoadingWidget, 1, false, 3);
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -93,27 +99,50 @@ void AAdventureDemoCharacter::OnGrabPressed()
 	else { Grabbable->Release(); }
 }
 
-//void AAdventureDemoCharacter::ShowLoadingWidget()
-//{
-//	if (!LoadingWidget && MasterGameInstance->LoadingWidgetClass)
-//	{
-//		LoadingWidget = CreateWidget<UUserWidget>(this, MasterGameInstance->LoadingWidgetClass);
-//		if (LoadingWidget)
-//		{
-//			LoadingWidget->AddToViewport();
-//		}
-//	}
-//}
-//
-//void AAdventureDemoCharacter::RemoveLoadingWidget()
-//{
-//	if (LoadingWidget)
-//	{
-//		//LoadingWidget->SetColorAndOpacity(FLinearColor::LerpUsingHSV(FLinearColor(1, 1, 1, 1), FLinearColor(1, 1, 1, 0), 0.3f));
-//		LoadingWidget->RemoveFromParent();
-//		LoadingWidget = nullptr;
-//	}
-//}
+void AAdventureDemoCharacter::ShowLoadingWidget()
+{
+	if (!LoadingWidget && LoadingWidgetClass)
+	{
+		LoadingWidget = CreateWidget<UUserWidget>(GetWorld(), LoadingWidgetClass);
+		if (LoadingWidget)
+		{
+			LoadingWidget->AddToViewport();
+			BPLoadingWidgetClass = LoadingWidget->GetWidgetTreeOwningClass();
+		}
+	}
+}
+
+void AAdventureDemoCharacter::AnimateLoadingWidget()
+{
+	if (LoadingWidget)
+	{
+		if (BPLoadingWidgetClass->Animations[0] != nullptr)
+		{
+			LoadingWidget->PlayAnimationForward(BPLoadingWidgetClass->Animations[0], 1, false);
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAdventureDemoCharacter::CleanLoadingWidget, 1, false, 3);
+		}
+		else 
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "LoadingWidget animation not found!");
+		}
+	}
+}
+
+void AAdventureDemoCharacter::CleanLoadingWidget()
+{
+	//Add Input Mapping Context
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+
+	LoadingWidget->RemoveFromParent();
+	LoadingWidget = nullptr;
+}
 
 void AAdventureDemoCharacter::ManageUIWidget()
 {
