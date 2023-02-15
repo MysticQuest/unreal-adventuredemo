@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Blueprint/UserWidget.h"
 #include "MasterGameInstance.generated.h"
 
 /**
  * 
  */
-UCLASS()
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ADVENTUREDEMO_API UMasterGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
@@ -27,4 +28,10 @@ public:
 		FName GrabbedTag = "Grabbed";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
 		FName SkeletonSkullTag = "JoinSkeleton";
+
+	TSubclassOf<UUserWidget> LoadingWidgetClass;
+
+private:
+
+	UUserWidget* LoadingWidget;
 };

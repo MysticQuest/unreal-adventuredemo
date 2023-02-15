@@ -5,6 +5,7 @@
 #include "Animation/AnimInstance.h"
 #include "Blueprint/UserWidget.h"
 #include "UMG/Public/Animation/WidgetAnimation.h"
+#include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
@@ -52,19 +53,17 @@ void AAdventureDemoCharacter::BeginPlay()
 		}
 	}
 
+	MasterGameInstance = Cast<UMasterGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+
 	Grabbable = Cast<UGrabbable>(GetComponentByClass(UGrabbable::StaticClass()));
 	DotWidget = CreateWidget<UUserWidget>(GetWorld(), DotWidgetClass);
 	DotWidget->AddToViewport();
 
-	/*MyAudio = this->FindComponentByClass<UAudioSource>();*/
+	MyAudio = this->FindComponentByClass<UAudioSource>();
+	if (MyAudio) { MyAudio->Super::FadeIn(3, MyAudio->Super::GetSound()->GetVolumeMultiplier(), 0, EAudioFaderCurve::Linear); }
 
-	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, FString::Printf(TEXT("Calling timer...")));
 	//FTimerHandle TimerHandle;
-	//GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAdventureDemoCharacter::DebugMe, 1, false, 3);
-}
-
-void AAdventureDemoCharacter::DebugMe()
-{
+	//GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AAdventureDemoCharacter::RemoveLoadingWidget, 1, false, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -90,14 +89,33 @@ void AAdventureDemoCharacter::SetupPlayerInputComponent(class UInputComponent* P
 
 void AAdventureDemoCharacter::OnGrabPressed()
 {
-	if (!Grabbable->IsGrabbing()) 
-	{ 
-		Grabbable->Grab(); 
-	}
+	if (!Grabbable->IsGrabbing()) { Grabbable->Grab(); }
 	else { Grabbable->Release(); }
 }
 
-void AAdventureDemoCharacter::WidgetManager()
+//void AAdventureDemoCharacter::ShowLoadingWidget()
+//{
+//	if (!LoadingWidget && MasterGameInstance->LoadingWidgetClass)
+//	{
+//		LoadingWidget = CreateWidget<UUserWidget>(this, MasterGameInstance->LoadingWidgetClass);
+//		if (LoadingWidget)
+//		{
+//			LoadingWidget->AddToViewport();
+//		}
+//	}
+//}
+//
+//void AAdventureDemoCharacter::RemoveLoadingWidget()
+//{
+//	if (LoadingWidget)
+//	{
+//		//LoadingWidget->SetColorAndOpacity(FLinearColor::LerpUsingHSV(FLinearColor(1, 1, 1, 1), FLinearColor(1, 1, 1, 0), 0.3f));
+//		LoadingWidget->RemoveFromParent();
+//		LoadingWidget = nullptr;
+//	}
+//}
+
+void AAdventureDemoCharacter::ManageUIWidget()
 {
 	if (!Grabbable || !DotWidget) { return; }
 	FHitResult HitResult;

@@ -17,6 +17,11 @@ class ADVENTUREDEMO_API UAudioSource : public UAudioComponent
 public:
 	UAudioSource();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extra Sounds")
+		USoundBase* Sound_1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extra Sounds")
+		USoundBase* Sound_2;
+
 	UFUNCTION(BlueprintCallable, Category = "Audio")
 		void PlaySound();
 

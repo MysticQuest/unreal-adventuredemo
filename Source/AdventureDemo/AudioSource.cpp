@@ -22,7 +22,7 @@ void UAudioSource::PlayForSeconds(float PlayTime)
 
 void UAudioSource::LoopForTimes(int32 NumLoops)
 {
-
+	// Reserved
 }
 
 void UAudioSource::StopSound()

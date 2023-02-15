@@ -6,8 +6,9 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "Grabbable.h"
-//#include "AudioSource.h"
+#include "AudioSource.h"
 #include "Blueprint/UserWidget.h"
+#include "MasterGameInstance.h"
 #include "AdventureDemoCharacter.generated.h"
 
 class UInputComponent;
@@ -68,7 +69,7 @@ public:
 	bool GetHasRifle();
 
 	UFUNCTION(BlueprintCallable, Category = Widget)
-	void WidgetManager();
+		void ManageUIWidget();
 
 protected:
 	/** Called for movement input */
@@ -101,7 +102,14 @@ private:
 	UUserWidget* DotWidget;
 	UWidgetAnimation* FadeAnimation;
 
-	/*UAudioSource* MyAudio;*/
-	void DebugMe();
+	UAudioSource* MyAudio;
+	UMasterGameInstance* MasterGameInstance;
+	
+	UUserWidget* LoadingWidget;
+
+	//void ShowLoadingWidget();
+	//void RemoveLoadingWidget();
+
+
 };
 
